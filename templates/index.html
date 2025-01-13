@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Image Classifier</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --background-color: #f8fafc;
+            --card-background: #ffffff;
+            --border-color: #e2e8f0;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 2rem;
+            text-align: center;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        .card {
+            background: var(--card-background);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-title::before {
+            content: '';
+            width: 4px;
+            height: 1.25rem;
+            background-color: var(--primary-color);
+            border-radius: 2px;
+        }
+
+        .upload-zone {
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .upload-zone:hover, .upload-zone.dragover {
+            border-color: var(--primary-color);
+            background-color: #f0f9ff;
+        }
+
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .supported-classes {
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: #f8fafc;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        #preview, #outputImage {
+            max-width: 100%;
+            border-radius: 8px;
+            margin-top: 1.5rem;
+            display: none;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+
+        #result {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .result-success {
+            background-color: #dcfce7;
+            border: 1px solid #22c55e;
+            color: #166534;
+        }
+
+        .result-error {
+            background-color: #fee2e2;
+            border: 1px solid #ef4444;
+            color: #991b1b;
+        }
+
+        .confidence-bar {
+            background-color: #e2e8f0;
+            border-radius: 6px;
+            height: 12px;
+            margin-top: 0.75rem;
+            overflow: hidden;
+        }
+
+        .confidence-level {
+            height: 100%;
+            background-color: #22c55e;
+            border-radius: 6px;
+            transition: width 0.6s ease;
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .card {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Vehicle Image Classifier</h1>
+        
+        <!-- Upload Section -->
+        <div class="card">
+            <h2 class="card-title">Upload Image</h2>
+            <div class="upload-zone" id="dropZone">
+                <input type="file" id="fileInput" accept=".jpg,.jpeg,.png" style="display: none;">
+                <button class="btn" onclick="document.getElementById('fileInput').click()">
+                    Choose Image or Drag & Drop
+                </button>
+                <div class="supported-classes">
+                    Supported classes: airplane, bicycles, cars, motorbikes, ships
+                </div>
+            </div>
+        </div>
+
+        <!-- Path Input Section -->
+        <div class="card">
+            <h2 class="card-title">Enter Image Path</h2>
+            <input type="text" 
+                   class="input-field" 
+                   id="pathInput" 
+                   placeholder="Enter the full path to your image (e.g., C:\Images\car.jpg)">
+            <button class="btn" onclick="handlePathInput()" style="width: 100%;">
+                Process Image from Path
+            </button>
+        </div>
+
+        <!-- Preview and Results -->
+        <div class="card">
+            <img id="preview" alt="Preview">
+            <div id="result"></div>
+            <img id="outputImage" alt="Classified Image">
+        </div>
+    </div>
+
+    <script>
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const preview = document.getElementById('preview');
+        const result = document.getElementById('result');
+        const outputImage = document.getElementById('outputImage');
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length) {
+                handleFile(files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        async function handleFile(file) {
+            if (!file.type.startsWith('image/')) {
+                showResult('Please upload an image file.', false);
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+
+            try {
+                showResult('Processing your image...', true);
+                
+                const formData = new FormData();
+                formData.append('file', file);
+
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult(
+                        `<strong>Predicted Class:</strong> ${data.class}<br>` +
+                        `<strong>Confidence:</strong> ${(data.confidence * 100).toFixed(1)}%
+                        <div class="confidence-bar">
+                            <div class="confidence-level" style="width: ${data.confidence * 100}%"></div>
+                        </div>`,
+                        true
+                    );
+                    
+                    outputImage.src = data.output_image;
+                    outputImage.style.display = 'block';
+                } else {
+                    showResult(data.error || 'An error occurred', false);
+                }
+            } catch (error) {
+                showResult('Failed to connect to the server', false);
+            }
+        }
+
+        async function handlePathInput() {
+            const path = document.getElementById('pathInput').value.trim();
+            if (!path) {
+                showResult('Please enter a valid path', false);
+                return;
+            }
+
+            try {
+                showResult('Processing image from path...', true);
+                
+                const formData = new FormData();
+                formData.append('path', path);
+
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult(
+                        `<strong>Predicted Class:</strong> ${data.class}<br>` +
+                        `<strong>Confidence:</strong> ${(data.confidence * 100).toFixed(1)}%
+                        <div class="confidence-bar">
+                            <div class="confidence-level" style="width: ${data.confidence * 100}%"></div>
+                        </div>`,
+                        true
+                    );
+                    
+                    outputImage.src = data.output_image;
+                    outputImage.style.display = 'block';
+                } else {
+                    showResult(data.error || 'An error occurred', false);
+                }
+            } catch (error) {
+                showResult('Failed to connect to the server', false);
+            }
+        }
+
+        function showResult(message, isSuccess) {
+            result.innerHTML = message;
+            result.style.display = 'block';
+            result.className = isSuccess ? 'result-success' : 'result-error';
+        }
+    </script>
+</body>
+</html> 
