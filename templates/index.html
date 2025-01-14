@@ -1,58 +1,92 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vehicle Image Classifier</title>
-    <style>
-        :root {
-            --primary-color: #2563eb;
-            --primary-hover: #1d4ed8;
+   <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Vehicle Image Classifier</title>
+      <style>
+         :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --gradient-start: #4f46e5;
+            --gradient-end: #06b6d4;
             --background-color: #f8fafc;
             --card-background: #ffffff;
             --border-color: #e2e8f0;
             --text-primary: #1e293b;
             --text-secondary: #64748b;
-        }
+            --success-color: #059669;
+            --error-color: #dc2626;
+         }
 
-        * {
+         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-        }
+         }
 
-        body {
+         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background-color: var(--background-color);
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
             color: var(--text-primary);
             line-height: 1.6;
+            min-height: 100vh;
             padding: 2rem;
-        }
+         }
 
-        .container {
-            max-width: 800px;
+         .container {
+            max-width: 1000px;
             margin: 0 auto;
-        }
+         }
 
-        h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 2rem;
+         .hero {
             text-align: center;
-            padding-bottom: 1rem;
-            border-bottom: 2px solid var(--primary-color);
-        }
+            margin-bottom: 2.5rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            border-radius: 16px;
+            color: white;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+         }
 
-        .card {
+         h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(to right, #ffffff, #e0f2fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+         }
+
+         .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+         }
+
+         .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+         }
+
+         .card {
             background: var(--card-background);
-            border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
             padding: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 2.5rem;
+         }
 
-        .card-title {
+         .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+         }
+
+         .card-title {
             font-size: 1.25rem;
             font-weight: 600;
             color: var(--text-primary);
@@ -60,290 +94,558 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
-        }
+         }
 
-        .card-title::before {
-            content: '';
-            width: 4px;
-            height: 1.25rem;
-            background-color: var(--primary-color);
-            border-radius: 2px;
-        }
-
-        .upload-zone {
-            border: 2px dashed var(--border-color);
+         .icon {
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            padding: 0.5rem;
             border-radius: 8px;
+            color: white;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+         }
+
+         .supported-classes {
+            display: flex;
+            justify-content: center;
+            /* Centers content horizontally */
+            flex-wrap: wrap;
+            /* Allows wrapping if there’s not enough space */
+            gap: 1rem;
+            /* Adjusts spacing between tags */
+         }
+
+         .class-tag {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            background: var(--background-color);
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-weight: 500;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+         }
+
+         .class-tag:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+         }
+
+         .upload-zone {
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
             padding: 2rem;
             text-align: center;
             transition: all 0.3s ease;
             cursor: pointer;
-        }
+            background: linear-gradient(to bottom, #ffffff, #f8fafc);
+         }
 
-        .upload-zone:hover, .upload-zone.dragover {
+         .upload-zone:hover,
+         .upload-zone.dragover {
             border-color: var(--primary-color);
-            background-color: #f0f9ff;
-        }
+            background: linear-gradient(to bottom, #f0f9ff, #e0f2fe);
+         }
 
-        .btn {
-            background-color: var(--primary-color);
+         .btn {
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
             color: white;
             padding: 0.75rem 1.5rem;
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             font-size: 1rem;
             font-weight: 500;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: all 0.3s ease;
             display: inline-block;
             text-align: center;
-        }
+         }
 
-        .btn:hover {
-            background-color: var(--primary-hover);
-        }
+         .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+         }
 
-        .supported-classes {
-            margin-top: 1rem;
-            padding: 1rem;
-            background-color: #f8fafc;
-            border-radius: 6px;
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-        }
-
-        .input-field {
+         .input-field {
             width: 100%;
             padding: 0.75rem;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
             font-size: 1rem;
             margin-bottom: 1rem;
-            transition: border-color 0.3s ease;
-        }
+            transition: all 0.3s ease;
+            background: #f8fafc;
+         }
 
-        .input-field:focus {
+         .input-field:focus {
             outline: none;
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+            background: white;
+         }
 
-        #preview, #outputImage {
+         .results-card {
+            display: none;
+            margin-top: 2rem;
+         }
+
+         #preview,
+         #outputImage {
             max-width: 100%;
-            border-radius: 8px;
+            border-radius: 12px;
             margin-top: 1.5rem;
             display: none;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-        }
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+         }
 
-        #result {
-            margin-top: 1.5rem;
+         #result {
+            margin-top: 1rem;
             padding: 1rem;
-            border-radius: 8px;
+            border-radius: 12px;
             display: none;
-        }
+         }
 
-        .result-success {
-            background-color: #dcfce7;
+         .result-success {
+            background: linear-gradient(to right, #dcfce7, #f0fdf4);
             border: 1px solid #22c55e;
-            color: #166534;
-        }
+            padding: 2rem;
+         }
 
-        .result-error {
-            background-color: #fee2e2;
+         .result-error {
+            background: linear-gradient(to right, #fee2e2, #fef2f2);
             border: 1px solid #ef4444;
-            color: #991b1b;
-        }
+            padding: 2rem;
+         }
 
-        .confidence-bar {
-            background-color: #e2e8f0;
-            border-radius: 6px;
+         .prediction-results {
+            background: #f0fdf4;
+            border: 2px solid #22c55e;
+            border-radius: 12px;
+            padding: 2rem;
+         }
+
+         .prediction-label {
+            font-size: 1.25rem;
+            color: #065f46;
+         }
+
+         .prediction-class {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #4f46e5;
+            text-transform: capitalize;
+         }
+
+         .confidence-text {
+            font-size: 1.25rem;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+         }
+
+         .confidence-bar {
             height: 12px;
-            margin-top: 0.75rem;
+            background: #e2e8f0;
+            border-radius: 6px;
             overflow: hidden;
-        }
+            margin-top: 0.5rem;
+         }
 
-        .confidence-level {
+         .confidence-level {
             height: 100%;
-            background-color: #22c55e;
+            background: linear-gradient(90deg, #4f46e5, #06b6d4);
             border-radius: 6px;
             transition: width 0.6s ease;
-        }
+         }
 
-        @media (max-width: 640px) {
+         .image-container {
+            gap: 2rem;
+            margin-top: 2rem;
+            margin-top: 2rem;
+         }
+
+         .image-box {
+            background: white;
+            padding: 1rem;
+            margin-top: 0.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+         }
+
+         .image-box h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 1rem;
+         }
+
+         .image-box img {
+            width: 100%;
+            height: auto;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+         }
+
+         /* Add specific styling for local path images */
+         .local-image {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            border-radius: 8px;
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+         }
+
+         /* Add loading indicator for images */
+         .image-loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 300px;
+            background-color: #f8fafc;
+            border-radius: 8px;
+            border: 1px dashed #e2e8f0;
+         }
+
+         @media (max-width: 768px) {
+            .prediction-label {
+               font-size: 1.25rem;
+            }
+         }
+
+         .prediction-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+         }
+
+         @media (max-width: 768px) {
+            .prediction-value {
+               font-size: 1.5rem;
+            }
+         }
+
+         .confidence-value {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+         }
+
+         .error-message {
+            color: #dc2626;
+            background: #fee2e2;
+            border: 1px solid #ef4444;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            display: none;
+         }
+
+         @media (max-width: 768px) {
+            .prediction-class {
+               font-size: 2rem;
+            }
+
+            .image-box img {
+               height: 200px;
+            }
+         }
+
+         .loading {
+            display: none;
+            text-align: center;
+            padding: 1rem;
+            color: var(--text-secondary);
+         }
+
+         .loading::after {
+            content: "⏳";
+            display: inline-block;
+            animation: spin 2s linear infinite;
+         }
+
+         @keyframes spin {
+            0% {
+               transform: rotate(0deg);
+            }
+
+            100% {
+               transform: rotate(360deg);
+            }
+         }
+
+         @media (max-width: 768px) {
             body {
-                padding: 1rem;
+               padding: 1rem;
+            }
+
+            .grid {
+               grid-template-columns: 1fr;
             }
 
             h1 {
-                font-size: 2rem;
+               font-size: 2rem;
             }
-
-            .card {
-                padding: 1rem;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Vehicle Image Classifier</h1>
-        
-        <!-- Upload Section -->
-        <div class="card">
-            <h2 class="card-title">Upload Image</h2>
-            <div class="upload-zone" id="dropZone">
-                <input type="file" id="fileInput" accept=".jpg,.jpeg,.png" style="display: none;">
-                <button class="btn" onclick="document.getElementById('fileInput').click()">
-                    Choose Image or Drag & Drop
-                </button>
-                <div class="supported-classes">
-                    Supported classes: airplane, bicycles, cars, motorbikes, ships
-                </div>
+         }
+      </style>
+   </head>
+   <body>
+      <div class="container">
+         <div class="hero">
+            <h1>Vehicle Image Classifier</h1>
+            <p class="subtitle">Instantly classify vehicles using Yolo Model. By Mony Ratanak©</p>
+         </div>
+         <!-- Supported Classes Section -->
+         <div class="card">
+            <div class="card-title">
+               <span class="icon">ℹ️</span> Supported Classes
             </div>
-        </div>
-
-        <!-- Path Input Section -->
-        <div class="card">
-            <h2 class="card-title">Enter Image Path</h2>
-            <input type="text" 
-                   class="input-field" 
-                   id="pathInput" 
-                   placeholder="Enter the full path to your image (e.g., C:\Images\car.jpg)">
-            <button class="btn" onclick="handlePathInput()" style="width: 100%;">
-                Process Image from Path
-            </button>
-        </div>
-
-        <!-- Preview and Results -->
-        <div class="card">
-            <img id="preview" alt="Preview">
+            <div class="supported-classes">
+               <span class="class-tag">✈️ Airplane</span>
+               <span class="class-tag">🚲 Bicycle</span>
+               <span class="class-tag">🚗 Car</span>
+               <span class="class-tag">🏍️ Motorbike</span>
+               <span class="class-tag">🚢 Ship</span>
+            </div>
+         </div>
+         <div class="grid">
+            <!-- Upload Section -->
+            <div class="card">
+               <div class="card-title">
+                  <span class="icon">📁</span> Upload Image
+               </div>
+               <div class="upload-zone" id="dropZone">
+                  <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                  <button class="btn" onclick="document.getElementById('fileInput').click()"> Choose Image or Drag & Drop </button>
+               </div>
+            </div>
+            <!-- URL Section -->
+            <div class="card">
+               <div class="card-title">
+                  <span class="icon">🌐</span> Image URL
+               </div>
+               <form id="urlForm" onsubmit="handleUrl(event)">
+                  <input type="url" class="input-field" id="urlInput" placeholder="Paste image URL here" required>
+                  <button type="submit" class="btn" style="width: 100%;"> Analyze from URL </button>
+               </form>
+            </div>
+            <!-- Path Section -->
+            <div class="card">
+               <div class="card-title">
+                  <span class="icon">📍</span> Local Path
+               </div>
+               <form id="pathForm" onsubmit="handlePath(event)">
+                  <input type="text" class="input-field" id="pathInput" placeholder="Enter local image path" required>
+                  <button type="submit" class="btn" style="width: 100%;"> Process from Path </button>
+               </form>
+            </div>
+         </div>
+         <!-- Updated Results Section -->
+         <div class="card results-card" id="resultsCard" style="display: none;">
+            <div class="card-title">
+               <span class="icon">📊</span> Results
+            </div>
+            <div id="loading" class="loading"> Processing image... </div>
             <div id="result"></div>
-            <img id="outputImage" alt="Classified Image">
-        </div>
-    </div>
-
-    <script>
-        const dropZone = document.getElementById('dropZone');
-        const fileInput = document.getElementById('fileInput');
-        const preview = document.getElementById('preview');
-        const result = document.getElementById('result');
-        const outputImage = document.getElementById('outputImage');
-
-        dropZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            dropZone.classList.add('dragover');
-        });
-
-        dropZone.addEventListener('dragleave', () => {
-            dropZone.classList.remove('dragover');
-        });
-
-        dropZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropZone.classList.remove('dragover');
-            const files = e.dataTransfer.files;
-            if (files.length) {
-                handleFile(files[0]);
+            <div class="image-container">
+               <div class="image-box">
+                  <h3>Original Image</h3>
+                  <img id="preview" alt="Original Image">
+               </div>
+               <div class="image-box">
+                  <h3>Predicted Image</h3>
+                  <img id="outputImage" alt="Processed Image">
+               </div>
+            </div>
+         </div>
+      </div>
+      <script>
+         document.addEventListener('DOMContentLoaded', () => {
+            const dropZone = document.getElementById('dropZone');
+            const fileInput = document.getElementById('fileInput');
+            // File input change handler
+            fileInput.addEventListener('change', (e) => {
+               const file = e.target.files[0];
+               if (file) {
+                  handleFile(file);
+               }
+            });
+            // Drag and drop handlers
+            dropZone.addEventListener('dragover', (e) => {
+               e.preventDefault();
+               e.stopPropagation();
+               dropZone.classList.add('dragover');
+            });
+            dropZone.addEventListener('dragleave', (e) => {
+               e.preventDefault();
+               e.stopPropagation();
+               dropZone.classList.remove('dragover');
+            });
+            dropZone.addEventListener('drop', (e) => {
+               e.preventDefault();
+               e.stopPropagation();
+               dropZone.classList.remove('dragover');
+               const file = e.dataTransfer.files[0];
+               if (file) {
+                  handleFile(file);
+               }
+            });
+         });
+         // Handle URL submission
+         async function handleUrl(event) {
+            event.preventDefault();
+            const url = document.getElementById('urlInput').value.trim();
+            if (!url) {
+               showResult('Please enter a valid URL', false);
+               return;
             }
-        });
-
-        fileInput.addEventListener('change', (e) => {
-            if (e.target.files.length) {
-                handleFile(e.target.files[0]);
-            }
-        });
-
-        async function handleFile(file) {
-            if (!file.type.startsWith('image/')) {
-                showResult('Please upload an image file.', false);
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                preview.src = e.target.result;
-                preview.style.display = 'block';
-            };
-            reader.readAsDataURL(file);
-
             try {
-                showResult('Processing your image...', true);
-                
-                const formData = new FormData();
-                formData.append('file', file);
-
-                const response = await fetch('/predict', {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                const data = await response.json();
-                
-                if (response.ok) {
-                    showResult(
-                        `<strong>Predicted Class:</strong> ${data.class}<br>` +
-                        `<strong>Confidence:</strong> ${(data.confidence * 100).toFixed(1)}%
-                        <div class="confidence-bar">
-                            <div class="confidence-level" style="width: ${data.confidence * 100}%"></div>
-                        </div>`,
-                        true
-                    );
-                    
-                    outputImage.src = data.output_image;
-                    outputImage.style.display = 'block';
-                } else {
-                    showResult(data.error || 'An error occurred', false);
-                }
+               showResult('Processing image from URL...', true);
+               await processImage('url', url);
             } catch (error) {
-                showResult('Failed to connect to the server', false);
+               showResult(`Failed to process URL: ${error.message}`, false);
             }
-        }
-
-        async function handlePathInput() {
+         }
+         async function handlePath(event) {
+            event.preventDefault();
             const path = document.getElementById('pathInput').value.trim();
             if (!path) {
-                showResult('Please enter a valid path', false);
-                return;
+               showResult('Please enter a valid path', false);
+               return;
             }
-
             try {
-                showResult('Processing image from path...', true);
-                
-                const formData = new FormData();
-                formData.append('path', path);
-
-                const response = await fetch('/predict', {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                const data = await response.json();
-                
-                if (response.ok) {
-                    showResult(
-                        `<strong>Predicted Class:</strong> ${data.class}<br>` +
-                        `<strong>Confidence:</strong> ${(data.confidence * 100).toFixed(1)}%
-                        <div class="confidence-bar">
-                            <div class="confidence-level" style="width: ${data.confidence * 100}%"></div>
-                        </div>`,
-                        true
-                    );
-                    
-                    outputImage.src = data.output_image;
-                    outputImage.style.display = 'block';
-                } else {
-                    showResult(data.error || 'An error occurred', false);
-                }
+               showResult('Processing image from path...', true);
+               // Show the results card and preview container immediately
+               document.getElementById('resultsCard').style.display = 'block';
+               document.getElementById('preview').style.display = 'block';
+               await processImage('path', path);
             } catch (error) {
-                showResult('Failed to connect to the server', false);
+               showResult(`Failed to process path: ${error.message}`, false);
             }
-        }
+         }
+         // Handle file upload
+         async function handleFile(file) {
+            if (!file.type.startsWith('image/')) {
+               showResult('Please upload an image file.', false);
+               return;
+            }
+            try {
+               showResult('Processing uploaded image...', true);
+               await processImage('file', file);
+            } catch (error) {
+               showResult(`Failed to process file: ${error.message}`, false);
+            }
+         }
+         async function processImage(type, source) {
+            const formData = new FormData();
+            const loading = document.getElementById('loading');
+            const resultsCard = document.getElementById('resultsCard');
+            const errorMessage = document.createElement('div');
+            errorMessage.className = 'error-message';
+            resultsCard.style.display = 'block';
+            loading.style.display = 'block';
+            try {
+               // Clear any existing error messages
+               const existingError = document.querySelector('.error-message');
+               if (existingError) existingError.remove();
+               switch (type) {
+                  case 'file':
+                     formData.append('file', source);
+                     await showPreview(source);
+                     break;
+                  case 'url':
+                     formData.append('url', source);
+                     await showPreview(source);
+                     break;
+                  case 'path':
+                     formData.append('path', source);
+                     // For local path, we'll wait for server response
+                     formData.append('local', 'true');
+                     await showPreview(source);
+                     break;
+               }
+               const response = await fetch('/predict', {
+                  method: 'POST',
+                  body: formData
+               });
+               if (!response.ok) {
+                  throw new Error(`HTTP error! status: ${response.status}`);
+               }
+               const data = await response.json();
+               // For local path, update preview after getting response
+               if (type === 'path' && data.original_image) {
+                  await showPreview(data.original_image);
+               }
+               handlePredictionResult(data);
+            } catch (error) {
+               errorMessage.textContent = `Error: ${error.message}`;
+               errorMessage.style.display = 'block';
+               resultsCard.appendChild(errorMessage);
+               loading.style.display = 'none';
+            }
+         }
 
-        function showResult(message, isSuccess) {
+         function handlePredictionResult(data) {
+            const resultsCard = document.getElementById('resultsCard');
+            const result = document.getElementById('result');
+            resultsCard.style.display = 'block';
+            // Updated prediction display
+            result.innerHTML = `
+                
+										<div class="prediction-results">
+											<div class="prediction-label">Prediction Results: </div>
+											<div class="prediction-class">${data.class}</div>
+											<div class="confidence-text">Confidence: ${(data.confidence * 100).toFixed(1)}%</div>
+											<div class="confidence-bar">
+												<div class="confidence-level" style="width: ${data.confidence * 100}%"></div>
+											</div>
+										</div>
+            `;
+            // Handle output image
+            const outputImage = document.getElementById('outputImage');
+            if (data.output_image) {
+               outputImage.src = data.output_image;
+               outputImage.style.display = 'block';
+            }
+         }
+         async function showPreview(source) {
+            return new Promise((resolve, reject) => {
+               const preview = document.getElementById('preview');
+               if (typeof source === 'string') {
+                  // Handle both URLs and local paths
+                  preview.onload = () => {
+                     preview.style.display = 'block';
+                     resolve();
+                  };
+                  preview.onerror = () => {
+                     reject(new Error('Failed to load image'));
+                  };
+                  preview.src = source;
+               } else if (source instanceof File) {
+                  const reader = new FileReader();
+                  reader.onload = (e) => {
+                     preview.src = e.target.result;
+                     preview.onload = () => {
+                        preview.style.display = 'block';
+                        resolve();
+                     };
+                  };
+                  reader.onerror = () => reject(new Error('Failed to read file'));
+                  reader.readAsDataURL(source);
+               }
+            });
+         }
+         // Show result message
+         function showResult(message, isSuccess) {
+            const result = document.getElementById('result');
             result.innerHTML = message;
             result.style.display = 'block';
             result.className = isSuccess ? 'result-success' : 'result-error';
-        }
-    </script>
-</body>
-</html> 
+         }
+      </script>
+   </body>
+</html>
